@@ -1,18 +1,20 @@
 #include "SDL2/SDL.h"
 #include "Graph/Graph.hpp"
 #include <iostream>
+#include <cmath>
 
 #define WINDOW_W 600
 #define WINDOW_H 500
-#define FPS 30
-#define FRAME_DELAY 1000 / FPS
+#define FPS 60
+// #define FRAME_DELAY 1000 / FPS
+#define FRAME_DELAY 16
 
 int main(int argc, char* argv[]) {
 
-    std::cout << "Shit works.\n";
     bool isRunning = true;
 
     unsigned int t = 0, dt = 0;
+    float elapsed;
 
     SDL_Window *window;
     SDL_Renderer *renderer;
@@ -32,6 +34,13 @@ int main(int argc, char* argv[]) {
 
     Graph *graph = new Graph();
 
+    graph->addElement();
+    graph->addElement();
+    graph->addElement();
+    graph->addElement();
+    graph->addElement();
+    graph->addElement();
+
     SDL_Color colorBG = { 0, 0, 0, 255 };
 
     while(isRunning) {
@@ -48,6 +57,14 @@ int main(int argc, char* argv[]) {
             case SDL_MOUSEBUTTONDOWN:
                 SDL_GetMouseState(&x, &y);
                 SDL_Log("[%d, %d]", x, y);
+
+                if(!graph->isThereElementSelected()) {
+                    graph->selectElement(x, y);
+                } else {
+                    graph->moveElement(x, y);
+                    graph->unselectElement();
+                }
+                
             default:
                 break;
             }
@@ -57,14 +74,14 @@ int main(int argc, char* argv[]) {
         SDL_SetRenderDrawColor(renderer, colorBG.r, colorBG.g, colorBG.b, colorBG.a);
         SDL_RenderClear(renderer);
 
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         graph->Render(renderer);
 
         SDL_RenderPresent(renderer);
 
-        dt = SDL_GetTicks() - t;
-        if(FRAME_DELAY > t) {
-            SDL_Delay(FRAME_DELAY - dt);
-        }
+        dt = SDL_GetTicks();
+        elapsed = (dt - t) / (float)SDL_GetTicks();
+        SDL_Delay(std::floor(16.666f - elapsed));
     }
 
     delete graph;
