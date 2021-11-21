@@ -32,9 +32,13 @@ public:
 
     bool isThereElementSelected();
     
+    void addTwoWayNodeConnections(Node *n1, Node *n2);
+
+    void scanConnections();
 private:
     Node *selectedElement = NULL;
     int selectedShapeIndex = 0;
     std::vector<Node*> elements;
     std::vector<SDL_Rect*> shapes;
+    std::vector<std::vector<Node*>> nodeConnections;
 };

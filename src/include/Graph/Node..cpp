@@ -17,6 +17,10 @@ void Node::addTwoWayConnection(Node* n) {
     n->addConnection(this);
 }
 
+std::vector<Node*> Node::getConnections() {
+    return this->connections;
+}
+
 void Node::removeConnection() {
     this->connections.pop_back();
 }

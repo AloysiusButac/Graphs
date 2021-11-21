@@ -5,9 +5,11 @@
 
 #define WINDOW_W 600
 #define WINDOW_H 500
-#define FPS 60
-// #define FRAME_DELAY 1000 / FPS
 #define FRAME_DELAY 16
+
+//TODO: Roconfigure node functions relating to node connections: make it neater
+//      Add interaction modes in the program
+//      Add button... possibly
 
 int main(int argc, char* argv[]) {
 
@@ -34,12 +36,22 @@ int main(int argc, char* argv[]) {
 
     Graph *graph = new Graph();
 
-    graph->addElement();
-    graph->addElement();
-    graph->addElement();
-    graph->addElement();
-    graph->addElement();
-    graph->addElement();
+    Node* n1 = new Node();
+    Node* n2 = new Node();
+    Node* n3 = new Node();
+    Node* n4 = new Node();
+
+    graph->addElement(n1);
+    graph->addElement(n2);
+    graph->addElement(n3);
+    graph->addElement(n4);
+
+    n1->addConnection(n2);
+    n2->addConnection(n3);
+    n3->addConnection(n4);
+    n4->addConnection(n1);
+
+    graph->scanConnections();
 
     SDL_Color colorBG = { 0, 0, 0, 255 };
 
@@ -61,7 +73,7 @@ int main(int argc, char* argv[]) {
                 if(!graph->isThereElementSelected()) {
                     graph->selectElement(x, y);
                 } else {
-                    graph->moveElement(x, y);
+                    graph->moveElement(x-10, y-10);
                     graph->unselectElement();
                 }
                 
@@ -85,6 +97,10 @@ int main(int argc, char* argv[]) {
     }
 
     delete graph;
+    delete n1;
+    delete n2;
+    delete n3;
+    delete n4;
 
     SDL_DestroyWindow(window);
     SDL_DestroyRenderer(renderer);

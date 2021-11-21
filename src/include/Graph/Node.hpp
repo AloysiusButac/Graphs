@@ -2,6 +2,7 @@
 #pragma once
 
 #include <vector>
+#include <array>
 #include "SDL2/SDL.h"
 
 // TODO: Make GUI
@@ -15,6 +16,8 @@ public:
     void addConnection(Node* n);
 
     void addTwoWayConnection(Node* n);
+
+    std::vector<Node*> getConnections();
 
     void removeConnection();
     
