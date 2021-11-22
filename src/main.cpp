@@ -1,5 +1,7 @@
 #include "SDL2/SDL.h"
+#include "SDL2/SDL_ttf.h"
 #include "Graph/Graph.hpp"
+#include "Graph/Text.hpp"
 #include <iostream>
 #include <cmath>
 
@@ -34,7 +36,25 @@ int main(int argc, char* argv[]) {
         }
     }
 
+    TTF_Font *font;
+
+    if(!TTF_Init()) {
+        font = TTF_OpenFont("src/Fonts/OpenSans-Regular.ttf", 20);
+    }
+
+    if(!font) {
+        SDL_Log("Font Failed to load");
+        isRunning = false;
+    }
+    
     Graph *graph = new Graph();
+
+    Text *text1 = new Text();
+    text1->setText("This is a text");
+    text1->setFont(font);
+    text1->setFontSize(20);
+    SDL_Color font_color = {255, 255, 255, 255};
+    text1->setColor(&font_color);
 
     Node* n1 = new Node();
     Node* n2 = new Node();
@@ -46,10 +66,9 @@ int main(int argc, char* argv[]) {
     graph->addElement(n3);
     graph->addElement(n4);
 
-    n1->addConnection(n2);
-    n2->addConnection(n3);
-    n3->addConnection(n4);
-    n4->addConnection(n1);
+    graph->addNodeConnection(n1, n2);
+    graph->addNodeConnection(n2, n3);
+    graph->addTwoWayNodeConnections(n4, n3);
 
     graph->scanConnections();
 
@@ -68,7 +87,7 @@ int main(int argc, char* argv[]) {
                 break;
             case SDL_MOUSEBUTTONDOWN:
                 SDL_GetMouseState(&x, &y);
-                SDL_Log("[%d, %d]", x, y);
+                // SDL_Log("[%d, %d]", x, y);
 
                 if(!graph->isThereElementSelected()) {
                     graph->selectElement(x, y);
@@ -85,9 +104,10 @@ int main(int argc, char* argv[]) {
         // Render
         SDL_SetRenderDrawColor(renderer, colorBG.r, colorBG.g, colorBG.b, colorBG.a);
         SDL_RenderClear(renderer);
-
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+
         graph->Render(renderer);
+        text1->displayText(renderer);
 
         SDL_RenderPresent(renderer);
 
@@ -96,7 +116,9 @@ int main(int argc, char* argv[]) {
         SDL_Delay(std::floor(16.666f - elapsed));
     }
 
+    TTF_CloseFont(font);
     delete graph;
+    delete text1;
     delete n1;
     delete n2;
     delete n3;

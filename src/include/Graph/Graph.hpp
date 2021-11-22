@@ -31,7 +31,9 @@ public:
     void moveElement(int _x, int _y);
 
     bool isThereElementSelected();
-    
+
+    void addNodeConnection(Node *n1, Node *n2);
+
     void addTwoWayNodeConnections(Node *n1, Node *n2);
 
     void scanConnections();

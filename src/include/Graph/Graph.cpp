@@ -118,6 +118,10 @@ bool Graph::isThereElementSelected() {
     return this->selectedElement ? true : false;
 }
 
+void Graph::addNodeConnection(Node *n1, Node *n2) {
+    n1->addConnection(n2);
+}
+
 void Graph::addTwoWayNodeConnections(Node *n1, Node *n2) {
    n1->addTwoWayConnection(n2);
 }
