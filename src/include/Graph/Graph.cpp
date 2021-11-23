@@ -53,6 +53,7 @@ void Graph::addElement(Node* n) {
     SDL_Log("element size: %d", this->elements.size());
 }
 
+// TODO: Fix removeElement functions
 void Graph::removeElement(int index) {
     if(index < (int)this->elements.size()) {
         delete this->elements[index];
@@ -104,6 +105,10 @@ void Graph::selectElement(int _x, int _y) {
     }
 }
 
+Node* Graph::getSelectedElement() {
+    return this->selectedElement;
+}
+
 void Graph::unselectElement() {
     this->selectedElement = NULL;
 }
@@ -127,7 +132,31 @@ void Graph::addTwoWayNodeConnections(Node *n1, Node *n2) {
 }
 
 void Graph::scanConnections() {
+    this->nodeConnections.clear();
     for(auto&& e : this->elements) {
         this->nodeConnections.push_back(e->getConnections());
     }
+}
+
+bool Graph::isThereElementHere(int x, int y) {
+    int e_x, e_y;
+    for(auto&& e : this->elements) {
+        e->getPosition(&e_x, &e_y);
+        if(x > e_x && y > e_y && x < e_x+20 && y < e_y+20) {
+            return true;
+        }
+    }
+    return false;
+}
+
+Node* Graph::getElement(int x, int y) {
+    int e_x, e_y;
+    for(auto&& e : elements) {
+        e->getPosition(&e_x, &e_y);
+        if(x > e_x && y > e_y && x < e_x+20 && y < e_y+20) {
+            return e;
+        }
+    }
+
+    return NULL;
 }

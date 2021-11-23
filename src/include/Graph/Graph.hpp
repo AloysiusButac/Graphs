@@ -26,6 +26,8 @@ public:
 
     void selectElement(int _x, int _y);
 
+    Node* getSelectedElement();
+
     void unselectElement();
 
     void moveElement(int _x, int _y);
@@ -37,6 +39,10 @@ public:
     void addTwoWayNodeConnections(Node *n1, Node *n2);
 
     void scanConnections();
+
+    bool isThereElementHere(int x, int y);
+
+    Node* getElement(int x, int y);
 private:
     Node *selectedElement = NULL;
     int selectedShapeIndex = 0;

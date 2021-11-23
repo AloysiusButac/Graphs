@@ -3,14 +3,20 @@
 Text::Text() { 
     setText("new Text.\n");
 }
-Text::Text(const char* text, int font_size) { 
-    setText(text);
-    setFontSize(font_size);
+Text::Text(const char* _text, int _font_size) { 
+    setText(_text);
+    setFontSize(_font_size);
+}
+Text::Text(const char* _text, TTF_Font* _font, int _font_size, SDL_Color* _color) {
+    this->text = _text;
+    this->font = _font;
+    this->font_size =_font_size;
+    this->color = _color;
 }
 Text::~Text() { }
 
 void Text::setText(const char* _text) {
-    this->text = text;
+    this->text = _text;
 }
 void Text::setFont(TTF_Font *_f) { 
     this->font = _f;
@@ -36,7 +42,7 @@ SDL_Color* Text::getBGColor() { return this->bg_color; }
 
 void Text::displayText(SDL_Renderer *ren) {
     if(this->font && this->color) {
-        SDL_Surface *tmp_surface = TTF_RenderText_Solid(this->font, "this is a text", {255, 255, 255});
+        SDL_Surface *tmp_surface = TTF_RenderText_Solid(this->font, this->text, {255, 255, 255});
         this->texture = SDL_CreateTextureFromSurface(ren, tmp_surface);
 
         SDL_Rect local_rect = {this->x, this->y, tmp_surface->w, tmp_surface->h};

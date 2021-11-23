@@ -5,7 +5,8 @@
 class Text {
 public:
     Text();
-    Text(const char* text, int font_size);
+    Text(const char* _text, int _font_size);
+    Text(const char* _text, TTF_Font *_font, int _font_sizze, SDL_Color *_color);
     ~Text();
 
     void setText(const char* _text);
