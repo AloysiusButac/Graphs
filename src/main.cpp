@@ -9,12 +9,11 @@
 #define WINDOW_H 500
 #define FRAME_DELAY 16
 
-//TODO: Roconfigure node functions relating to node connections: make it neater
-//      Fix interaction modes in the program
+//TODO: 
+//      Roconfigure node functions relating to node connections: make it neater
 //      Add button... possibly
 //      Add a configuration file... maybe
-//      Implement states.. Properly
-//      Check for memory leaks // NOTE: there are definitely memory leaks
+//      Revise node connenction removal
 
 enum GraphState { SELECT, CONNECT, REMOVE_CONNECTION, ADD_NONDE, DELETE_NONDE, END_STATE };
 
@@ -49,6 +48,8 @@ int main(int argc, char* argv[]) {
     unsigned int t = 0, dt = 0;
     float elapsed;
 
+    // SDL Window and Renderer Initialization
+
     SDL_Window *window;
     SDL_Renderer *renderer;
 
@@ -65,6 +66,8 @@ int main(int argc, char* argv[]) {
         }
     }
 
+    // SDL Font Initialization
+
     TTF_Font *font;
 
     if(!TTF_Init()) {
@@ -76,35 +79,40 @@ int main(int argc, char* argv[]) {
         isRunning = false;
     }
 
+    // Current game state
     GraphState currentnState = SELECT;
     
+    // Graph Object Initialization
+
     Graph *graph = new Graph();
+
+    // Program Object/Elements Initialization
+
+    graph->addElement();
+    graph->addElement();
+    graph->addElement();
+    graph->addElement();
 
     SDL_Color text_color = {255, 255, 255, 255};
     const char* text = "Press [Q] to move Nodes       Press [W] to add connections";
     Text *text1 = new Text(text, font, 12, &text_color);
-    text1->setPosition(10, WINDOW_H - 30);
+    text1->setPosition(10, WINDOW_H - 60);
+    text = "Press [E] to remove conenction       Press [R] to add node";
+    Text *text2 = new Text(text, font, 12, &text_color);
+    text2->setPosition(10, WINDOW_H - 40);
+    text = "Press [T] to delete node";
+    Text *text3 = new Text(text, font, 12, &text_color);
+    text3->setPosition(10, WINDOW_H - 20);
 
     const char* state_text = state_to_string(currentnState);
-    Text *text2 = new Text(state_text, font, 12, &text_color);
-    text2->setPosition(10 ,WINDOW_H - 50);
-
-    Node* n1 = new Node();
-    Node* n2 = new Node();
-    Node* n3 = new Node();
-    Node* n4 = new Node();
-
-    graph->addElement(n1);
-    graph->addElement(n2);
-    graph->addElement(n3);
-    graph->addElement(n4);
-
-    graph->addNodeConnection(n1, n2);
-    graph->addNodeConnection(n2, n3);
+    Text *text_state = new Text(state_text, font, 12, &text_color);
+    text_state->setPosition(10, 10);
 
     graph->scanConnections();
 
     SDL_Color colorBG = { 0, 0, 0, 255 };
+
+    // Program Loop
 
     while(isRunning) {
         t = SDL_GetTicks();
@@ -141,58 +149,50 @@ int main(int argc, char* argv[]) {
                     }
 
                 } else if(currentnState == REMOVE_CONNECTION) {
-                    if(!graph->isThereElementSelected()) {
-                        graph->selectElement(x, y);
-                    } else if(graph->isThereElementHere(x, y)) {
-                        graph->getSelectedElement()->removeConnection();
+                    if(graph->getElement(x, y) && graph->getElement(x, y)->getConnections().size() > 0) {
+                        graph->getElement(x, y)->removeConnection();
                         graph->scanConnections();
-                        graph->unselectElement();
-                    } else {
-                        graph->unselectElement();
                     }
+                    graph->unselectElement();
 
                 } else if(currentnState == ADD_NONDE) {
                     if(!graph->getElement(x, y)) {
-                        graph->addElement();
+                        graph->addElement(new Node(x-10, y-10));
                     }
 
                 } else if(currentnState == DELETE_NONDE) {
                     if(graph->getElementCount()) {
                         if(graph->getElement(x, y)) {
                             graph->removeElement(graph->getElement(x, y));
+                            graph->scanConnections();
                         }
                     }
 
                 }
 
-            case SDL_KEYUP:
+            case SDL_KEYDOWN:
                 switch (e.key.keysym.sym)
                 {
                 case SDLK_q:
                     currentnState = SELECT;    
-                    text2->setText(state_to_string(currentnState));
                     break;
                 case SDLK_w:
                     currentnState = CONNECT;    
-                    text2->setText(state_to_string(currentnState));
                     break;
                 case SDLK_e:
                     currentnState = REMOVE_CONNECTION;    
-                    text2->setText(state_to_string(currentnState));
                     break;
                 case SDLK_r:
                     currentnState = ADD_NONDE;    
-                    text2->setText(state_to_string(currentnState));
                     break;
                 case SDLK_t:
                     currentnState = DELETE_NONDE;    
-                    text2->setText(state_to_string(currentnState));
                     break;
 
                 default:
                     break;
                 }
-                text2->setText(state_to_string(currentnState));
+                text_state->setText(state_to_string(currentnState));
 
             default:
                 break;
@@ -207,6 +207,8 @@ int main(int argc, char* argv[]) {
         graph->Render(renderer);
         text1->displayText(renderer);
         text2->displayText(renderer);
+        text3->displayText(renderer);
+        text_state->displayText(renderer);
 
         SDL_RenderPresent(renderer);
 
@@ -215,14 +217,14 @@ int main(int argc, char* argv[]) {
         SDL_Delay(std::floor(16.666f - elapsed));
     }
 
+    // Clean-up
+
     TTF_CloseFont(font);
     delete graph;
     delete text1;
     delete text2;
-    delete n1;
-    delete n2;
-    delete n3;
-    delete n4;
+    delete text3;
+    delete text2;
 
     SDL_DestroyWindow(window);
     SDL_DestroyRenderer(renderer);

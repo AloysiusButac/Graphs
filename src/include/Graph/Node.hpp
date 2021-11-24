@@ -29,8 +29,7 @@ public:
 
     void getPosition(int *_x, int *_y);
 private:
-    void* value;
-    int x, y;
-    int radius;
+    void* value = 0;
+    int x = 0, y = 0;
     std::vector<Node*> connections;
 };

@@ -34,7 +34,7 @@ void Graph::addElement() {
     this->shapes[this->elements.size()-1]->x = 20 * this->elements.size();
     this->shapes[this->elements.size()-1]->y = 5;
     this->shapes[this->elements.size()-1]->w = 20;
-    this->shapes[this->elements.size()-1]->h = 20;
+this->shapes[this->elements.size()-1]->h = 20;
 
     SDL_Log("element size: %d", this->elements.size());
 }
@@ -42,18 +42,21 @@ void Graph::addElement() {
 void Graph::addElement(Node* n) {
     // Placing elements next to each other with margin of 5px
     this->elements.push_back(n);
-    this->elements[this->elements.size()-1]->setPosition(20 * this->elements.size(), 5);
+
+    int x = 20 * this->elements.size() + 5 * this->elements.size();
+    int y = 5;
+
+    this->elements[this->elements.size()-1]->getPosition(&x, &y);
 
     this->shapes.push_back(new SDL_Rect());
-    this->shapes[this->elements.size()-1]->x = 20 * this->elements.size();
-    this->shapes[this->elements.size()-1]->y = 5;
+    this->shapes[this->elements.size()-1]->x = x;
+    this->shapes[this->elements.size()-1]->y = y;
     this->shapes[this->elements.size()-1]->w = 20;
     this->shapes[this->elements.size()-1]->h = 20;
 
     SDL_Log("element size: %d", this->elements.size());
 }
 
-// TODO: Fix removeElement functions
 void Graph::removeElement(int index) {
     if(index < (int)this->elements.size()) {
         delete this->elements[index];
@@ -63,12 +66,15 @@ void Graph::removeElement(int index) {
 }
 
 void Graph::removeElement(Node* n) {
-    for(auto&& o : this->elements) {
-        if(&o == &n) {
-           delete o;
-           this->elements.shrink_to_fit();
-           this->shapes.pop_back();
-           break; 
+    for(int i = 0; i < this->elements.size(); i++) {
+        if(n == this->elements[i]) {
+            delete this->elements[i];
+            delete this->shapes[i];
+
+            this->elements.erase(this->elements.begin() + i);
+            this->shapes.erase(this->shapes.begin() + i);
+
+            return;
         }
     }
 }
