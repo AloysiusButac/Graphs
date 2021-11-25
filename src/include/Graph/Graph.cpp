@@ -8,9 +8,6 @@ Graph::~Graph() {
 }
 
 void Graph::Render(SDL_Renderer *ren) {
-    for(auto&& s : shapes) {
-        SDL_RenderFillRect(ren, s);
-    }
 
     int x=0, y=0;
     int x2=0, y2=0;
@@ -20,6 +17,16 @@ void Graph::Render(SDL_Renderer *ren) {
         for(auto&& c : nodeConnections[i]) {
             c->getPosition(&x2, &y2);
             SDL_RenderDrawLine(ren, x+10, y+10, x2+10, y2+10);
+        }
+    }
+
+    for(int i = 0 ; i < this->shapes.size(); i++) {
+        if(this->selectedElement && i == this->selectedShapeIndex) {
+            SDL_SetRenderDrawColor(ren, 255, 50, 50, 255);
+            SDL_RenderFillRect(ren, this->shapes[i]);
+            SDL_SetRenderDrawColor(ren, 255, 255, 255, 255);
+        } else {
+            SDL_RenderFillRect(ren, this->shapes[i]);
         }
     }
 
@@ -34,9 +41,9 @@ void Graph::addElement() {
     this->shapes[this->elements.size()-1]->x = 20 * this->elements.size();
     this->shapes[this->elements.size()-1]->y = 5;
     this->shapes[this->elements.size()-1]->w = 20;
-this->shapes[this->elements.size()-1]->h = 20;
+    this->shapes[this->elements.size()-1]->h = 20;
 
-    SDL_Log("element size: %d", this->elements.size());
+    // SDL_Log("element size: %d", this->elements.size());
 }
 
 void Graph::addElement(Node* n) {
@@ -54,20 +61,30 @@ void Graph::addElement(Node* n) {
     this->shapes[this->elements.size()-1]->w = 20;
     this->shapes[this->elements.size()-1]->h = 20;
 
-    SDL_Log("element size: %d", this->elements.size());
+    // SDL_Log("element size: %d", this->elements.size());
 }
 
 void Graph::removeElement(int index) {
     if(index < (int)this->elements.size()) {
+        for(auto&& c : this->elements[index]->getConnections()) {
+            c->removeConnection(this->elements[index]);
+        }
+
         delete this->elements[index];
-        this->elements.shrink_to_fit();
-        this->shapes.pop_back();
+        delete this->shapes[index];
+
+        this->elements.erase(this->elements.begin() + index);
+        this->shapes.erase(this->shapes.begin() + index);
     }
 }
 
 void Graph::removeElement(Node* n) {
     for(int i = 0; i < this->elements.size(); i++) {
         if(n == this->elements[i]) {
+            for(auto&& c : n->getConnections()) {
+                c->removeConnection(n);
+            }
+
             delete this->elements[i];
             delete this->shapes[i];
 

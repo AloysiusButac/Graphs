@@ -25,6 +25,14 @@ void Node::removeConnection() {
     this->connections.pop_back();
 }
 
+void Node::removeConnection(Node* n) {
+    for(int i = 0; i < this->connections.size(); i++) {
+        if(this->connections[i] == n) {
+            this->connections.erase(this->connections.begin() + i);
+        }
+    }
+}
+
 void Node::setValue(void* _val) {
     this->value = _val;
 }

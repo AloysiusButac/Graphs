@@ -15,7 +15,7 @@
 //      Add a configuration file... maybe
 //      Revise node connenction removal
 
-enum GraphState { SELECT, CONNECT, REMOVE_CONNECTION, ADD_NONDE, DELETE_NONDE, END_STATE };
+enum GraphState { SELECT, CONNECT, REMOVE_CONNECTION, ADD_NODE, DELETE_NODE, END_STATE };
 
 static const char* state_to_string(GraphState state) {
     switch (state)
@@ -29,10 +29,10 @@ static const char* state_to_string(GraphState state) {
     case CONNECT:
         return "CONNECT";
         break;
-    case ADD_NONDE:
+    case ADD_NODE:
         return "ADD_NODE";
         break;
-    case DELETE_NONDE:
+    case DELETE_NODE:
         return "DELETE_NODE";
         break;
     default:
@@ -128,7 +128,8 @@ int main(int argc, char* argv[]) {
 
             case SDL_MOUSEBUTTONDOWN:
                 SDL_GetMouseState(&x, &y);
-                // SDL_Log("[%d, %d]", x, y);
+
+                // Select and move nodes
                 if(currentnState == SELECT) {
                     if(!graph->isThereElementSelected()) {
                         graph->selectElement(x, y);
@@ -137,30 +138,41 @@ int main(int argc, char* argv[]) {
                         graph->unselectElement();
                     }
 
+                // Select nodes and connect them
                 } else if(currentnState == CONNECT) {
                     if(!graph->isThereElementSelected()) {
                         graph->selectElement(x, y);
+                    } else if(graph->getSelectedElement() == graph->getElement(x, y)) {
+                        graph->unselectElement();
                     } else if(graph->isThereElementHere(x, y)) {
-                        graph->addNodeConnection(graph->getSelectedElement(), graph->getElement(x ,y));
+                        graph->addTwoWayNodeConnections(graph->getSelectedElement(), graph->getElement(x ,y));
                         graph->scanConnections();
                         graph->unselectElement();
                     } else {
                         graph->unselectElement();
                     }
 
+                // Select nodes annd remove their connections(s)
                 } else if(currentnState == REMOVE_CONNECTION) {
-                    if(graph->getElement(x, y) && graph->getElement(x, y)->getConnections().size() > 0) {
-                        graph->getElement(x, y)->removeConnection();
+                    if(!graph->isThereElementSelected()) {
+                        graph->selectElement(x, y);
+                    } else if(graph->isThereElementHere(x, y)) {
+                        graph->getSelectedElement()->removeConnection(graph->getElement(x, y));
+                        graph->getElement(x, y)->removeConnection(graph->getSelectedElement());
                         graph->scanConnections();
+                        graph->unselectElement();
+                    } else {
+                        graph->unselectElement();
                     }
-                    graph->unselectElement();
 
-                } else if(currentnState == ADD_NONDE) {
+                // Add a new node
+                } else if(currentnState == ADD_NODE) {
                     if(!graph->getElement(x, y)) {
                         graph->addElement(new Node(x-10, y-10));
                     }
 
-                } else if(currentnState == DELETE_NONDE) {
+                // Delete a node and its connections
+                } else if(currentnState == DELETE_NODE) {
                     if(graph->getElementCount()) {
                         if(graph->getElement(x, y)) {
                             graph->removeElement(graph->getElement(x, y));
@@ -175,18 +187,23 @@ int main(int argc, char* argv[]) {
                 {
                 case SDLK_q:
                     currentnState = SELECT;    
+                    graph->unselectElement();
                     break;
                 case SDLK_w:
                     currentnState = CONNECT;    
+                    graph->unselectElement();
                     break;
                 case SDLK_e:
                     currentnState = REMOVE_CONNECTION;    
+                    graph->unselectElement();
                     break;
                 case SDLK_r:
-                    currentnState = ADD_NONDE;    
+                    currentnState = ADD_NODE;    
+                    graph->unselectElement();
                     break;
                 case SDLK_t:
-                    currentnState = DELETE_NONDE;    
+                    currentnState = DELETE_NODE;    
+                    graph->unselectElement();
                     break;
 
                 default:

@@ -20,6 +20,8 @@ public:
     std::vector<Node*> getConnections();
 
     void removeConnection();
+
+    void removeConnection(Node* n);
     
     void setValue(void* _val);
 
