@@ -13,7 +13,6 @@
 //      Roconfigure node functions relating to node connections: make it neater
 //      Add button... possibly
 //      Add a configuration file... maybe
-//      Revise node connenction removal
 
 enum GraphState { SELECT, CONNECT, REMOVE_CONNECTION, ADD_NODE, DELETE_NODE, END_STATE };
 
@@ -118,8 +117,10 @@ int main(int argc, char* argv[]) {
         t = SDL_GetTicks();
         // Handle Events
         SDL_Event e;
+
+        int x, y;
+        bool isMouseClicked = false;
         while(SDL_PollEvent(&e)) {
-            int x, y;
             switch (e.type)
             {
             case SDL_QUIT:
@@ -181,6 +182,14 @@ int main(int argc, char* argv[]) {
                     }
 
                 }
+                SDL_Log("mouse down.");
+                isMouseClicked = true;
+                break;
+            
+            case SDL_MOUSEBUTTONUP:
+                isMouseClicked = false;
+                SDL_Log("mouse up.");
+                break;
 
             case SDL_KEYDOWN:
                 switch (e.key.keysym.sym)
@@ -210,6 +219,14 @@ int main(int argc, char* argv[]) {
                     break;
                 }
                 text_state->setText(state_to_string(currentnState));
+                break;
+
+            case SDL_MOUSEMOTION:
+                if(graph->getSelectedElement() && isMouseClicked) {
+                    SDL_GetMouseState(&x, &y);
+                    graph->getSelectedElement()->setPosition(x, y);
+                }
+                break;
 
             default:
                 break;
