@@ -10,9 +10,10 @@
 #define FRAME_DELAY 16
 
 //TODO: 
-//      Roconfigure node functions relating to node connections: make it neater
+//      Reconfigure node functions relating to node connections: make it neater
 //      Add button... possibly
 //      Add a configuration file... maybe
+//      Fix mouse lag on moving nodes
 
 enum GraphState { SELECT, CONNECT, REMOVE_CONNECTION, ADD_NODE, DELETE_NODE, END_STATE };
 
@@ -107,9 +108,18 @@ int main(int argc, char* argv[]) {
     Text *text_state = new Text(state_text, font, 12, &text_color);
     text_state->setPosition(10, 10);
 
+    const char* mouse_click = state_to_string(currentnState);
+    Text *mouse_click_text = new Text(mouse_click, font, 12, &text_color);
+    mouse_click_text->setPosition(10, 30);
+
     graph->scanConnections();
 
     SDL_Color colorBG = { 0, 0, 0, 255 };
+
+    int x = 0, y = 0;
+    bool isMouseClicked = false;
+    bool isObjectDragged = false;
+    int initial_x = 0, initial_y = 0;
 
     // Program Loop
 
@@ -118,8 +128,6 @@ int main(int argc, char* argv[]) {
         // Handle Events
         SDL_Event e;
 
-        int x, y;
-        bool isMouseClicked = false;
         while(SDL_PollEvent(&e)) {
             switch (e.type)
             {
@@ -129,6 +137,9 @@ int main(int argc, char* argv[]) {
 
             case SDL_MOUSEBUTTONDOWN:
                 SDL_GetMouseState(&x, &y);
+
+                initial_x = x;
+                initial_y = y;
 
                 // Select and move nodes
                 if(currentnState == SELECT) {
@@ -182,13 +193,14 @@ int main(int argc, char* argv[]) {
                     }
 
                 }
-                SDL_Log("mouse down.");
                 isMouseClicked = true;
                 break;
             
             case SDL_MOUSEBUTTONUP:
                 isMouseClicked = false;
-                SDL_Log("mouse up.");
+                if(isObjectDragged) {
+                    graph->unselectElement();
+                }
                 break;
 
             case SDL_KEYDOWN:
@@ -222,9 +234,14 @@ int main(int argc, char* argv[]) {
                 break;
 
             case SDL_MOUSEMOTION:
-                if(graph->getSelectedElement() && isMouseClicked) {
-                    SDL_GetMouseState(&x, &y);
-                    graph->getSelectedElement()->setPosition(x, y);
+                SDL_GetMouseState(&x, &y);
+
+                if(currentnState == SELECT) {
+                    isObjectDragged = std::abs(initial_x - x) > 20 && std::abs(initial_y - y) > 20;
+
+                    if(graph->getSelectedElement() != NULL && isMouseClicked && isObjectDragged) {
+                        graph->moveElement(x-10, y-10);
+                    }
                 }
                 break;
 
@@ -233,6 +250,9 @@ int main(int argc, char* argv[]) {
             }
         }
         // Update
+        const char* mouse_text = isMouseClicked ? "True" : "False";
+        mouse_click_text->setText(mouse_text);
+
         // Render
         SDL_SetRenderDrawColor(renderer, colorBG.r, colorBG.g, colorBG.b, colorBG.a);
         SDL_RenderClear(renderer);
@@ -243,6 +263,7 @@ int main(int argc, char* argv[]) {
         text2->displayText(renderer);
         text3->displayText(renderer);
         text_state->displayText(renderer);
+        mouse_click_text->displayText(renderer);
 
         SDL_RenderPresent(renderer);
 

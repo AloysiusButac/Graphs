@@ -12,6 +12,8 @@ void Graph::Render(SDL_Renderer *ren) {
     int x=0, y=0;
     int x2=0, y2=0;
 
+    // Rendering node connections
+
     for(int i = 0; i < nodeConnections.size(); i++) {
         elements[i]->getPosition(&x, &y);
         for(auto&& c : nodeConnections[i]) {
@@ -19,6 +21,8 @@ void Graph::Render(SDL_Renderer *ren) {
             SDL_RenderDrawLine(ren, x+10, y+10, x2+10, y2+10);
         }
     }
+
+    // Rendering nodes
 
     for(int i = 0 ; i < this->shapes.size(); i++) {
         if(this->selectedElement && i == this->selectedShapeIndex) {
