@@ -45,7 +45,7 @@ public:
     Node* getElement(int x, int y);
 private:
     Node *selectedElement = NULL;
-    int selectedShapeIndex = 0;
+    unsigned int selectedShapeIndex = 0;
     std::vector<Node*> elements;
     std::vector<SDL_Rect*> shapes;
     std::vector<std::vector<Node*>> nodeConnections;

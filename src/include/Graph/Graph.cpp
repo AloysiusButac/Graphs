@@ -14,7 +14,7 @@ void Graph::Render(SDL_Renderer *ren) {
 
     // Rendering node connections
 
-    for(int i = 0; i < nodeConnections.size(); i++) {
+    for(unsigned int i = 0; i < nodeConnections.size(); i++) {
         elements[i]->getPosition(&x, &y);
         for(auto&& c : nodeConnections[i]) {
             c->getPosition(&x2, &y2);
@@ -24,7 +24,7 @@ void Graph::Render(SDL_Renderer *ren) {
 
     // Rendering nodes
 
-    for(int i = 0 ; i < this->shapes.size(); i++) {
+    for(unsigned int i = 0 ; i < this->shapes.size(); i++) {
         if(this->selectedElement && i == this->selectedShapeIndex) {
             SDL_SetRenderDrawColor(ren, 255, 50, 50, 255);
             SDL_RenderFillRect(ren, this->shapes[i]);
@@ -83,7 +83,7 @@ void Graph::removeElement(int index) {
 }
 
 void Graph::removeElement(Node* n) {
-    for(int i = 0; i < this->elements.size(); i++) {
+    for(unsigned int i = 0; i < this->elements.size(); i++) {
         if(n == this->elements[i]) {
             for(auto&& c : n->getConnections()) {
                 c->removeConnection(n);

@@ -26,7 +26,7 @@ void Node::removeConnection() {
 }
 
 void Node::removeConnection(Node* n) {
-    for(int i = 0; i < this->connections.size(); i++) {
+    for(unsigned int i = 0; i < this->connections.size(); i++) {
         if(this->connections[i] == n) {
             this->connections.erase(this->connections.begin() + i);
         }
