@@ -89,11 +89,6 @@ int main(int argc, char* argv[]) {
 
     // Program Object/Elements Initialization
 
-    // graph->addElement();
-    // graph->addElement();
-    // graph->addElement();
-    // graph->addElement();
-
     SDL_Color text_color = {255, 255, 255, 255};
     const char* text = "Press [Q] to move Nodes       Press [W] to add connections";
     Text *text1 = new Text(text, font, 12, &text_color);
@@ -108,6 +103,9 @@ int main(int argc, char* argv[]) {
     const char* state_text = state_to_string(currentnState);
     Text *text_state = new Text(state_text, font, 12, &text_color);
     text_state->setPosition(10, 10);
+
+    Text *txt_isDragging = new Text("isDragging", font, 12, &text_color);
+    txt_isDragging->setPosition(10, 30);
 
     graph->scanConnections();
 
@@ -136,6 +134,7 @@ int main(int argc, char* argv[]) {
                 break;
 
             case SDL_MOUSEBUTTONDOWN:
+                isMouseClicked = true;
 
                 // Select and move nodes
                 if(currentnState == SELECT) {
@@ -193,7 +192,6 @@ int main(int argc, char* argv[]) {
                     }
 
                 }
-                isMouseClicked = true;
                 break;
             
             case SDL_MOUSEBUTTONUP:
@@ -236,13 +234,18 @@ int main(int argc, char* argv[]) {
 
             case SDL_MOUSEMOTION:
                 if(currentnState == SELECT) {
+                    // if movement of mouse while held down (before mouse button goes up) is greater than a set value (15)
                     isObjectDragged = std::abs(initial_x - x) > 15 && std::abs(initial_y - y) > 15;
 
-                    if(graph->getSelectedElement() != NULL && isMouseClicked && isObjectDragged) {
+                    if(graph->getSelectedElement() && isMouseClicked && isObjectDragged) {
                         isDragging = true;
                     }
                 } else {
                     isObjectDragged = false;
+                }
+                {
+                    const char* bool_text = isObjectDragged ? "True" : "False";
+                    txt_isDragging->setText(bool_text);
                 }
                 break;
 
@@ -267,6 +270,7 @@ int main(int argc, char* argv[]) {
         text2->displayText(renderer);
         text3->displayText(renderer);
         text_state->displayText(renderer);
+        txt_isDragging->displayText(renderer);
 
         SDL_RenderPresent(renderer);
 
@@ -283,6 +287,8 @@ int main(int argc, char* argv[]) {
     delete text2;
     delete text3;
     delete text2;
+    delete text_state;
+    delete txt_isDragging;
 
     SDL_DestroyWindow(window);
     SDL_DestroyRenderer(renderer);
