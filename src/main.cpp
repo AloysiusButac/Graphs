@@ -136,11 +136,11 @@ int main(int argc, char* argv[]) {
             case SDL_MOUSEBUTTONDOWN:
                 isMouseClicked = true;
 
+                initial_x = x;
+                initial_y = y;
+
                 // Select and move nodes
                 if(currentnState == SELECT) {
-
-                    initial_x = x;
-                    initial_y = y;
 
                     if(!graph->isThereElementSelected()) {
                         graph->selectElement(x, y);
@@ -196,8 +196,9 @@ int main(int argc, char* argv[]) {
             
             case SDL_MOUSEBUTTONUP:
                 isMouseClicked = false;
-                if(isObjectDragged || isDragging) {
+                if(isDragging) {
                     graph->unselectElement();
+                    isDragging = false;
                 }
                 break;
 
